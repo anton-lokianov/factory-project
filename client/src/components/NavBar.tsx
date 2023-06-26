@@ -11,10 +11,9 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import FactoryIcon from "@mui/icons-material/Factory";
 import { RootState, store } from "../redux/Store";
-import { set } from "react-hook-form";
 import { setLogoutAction } from "../redux/UserReducer";
 import { useSelector } from "react-redux";
 
@@ -27,14 +26,15 @@ const NavBar = () => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
-
+  const location = useLocation();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.users.user);
   const fullName = user?.fullName;
 
   const pages = [
-    { label: "home", path: "home" },
     { label: "departments", path: "departments" },
+    { label: "employees", path: "employees" },
+    { label: "shifts", path: "shifts" },
   ];
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -67,7 +67,7 @@ const NavBar = () => {
             variant="h6"
             noWrap
             component="a"
-            href="/"
+            href="/home"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -109,11 +109,18 @@ const NavBar = () => {
               {pages.map((page) => (
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link
-                      style={{ textDecoration: "none", color: "black" }}
-                      to={`/${page.path}`}>
+                    <Box
+                      component={NavLink}
+                      to={`/${page.path}`}
+                      sx={{
+                        textDecoration: "none",
+                        color:
+                          location.pathname === `/${page.path}`
+                            ? "blue"
+                            : "black",
+                      }}>
                       {page.label}
-                    </Link>
+                    </Box>
                   </Typography>
                 </MenuItem>
               ))}
@@ -139,17 +146,29 @@ const NavBar = () => {
             {pages.map((page) => (
               <Button
                 key={page.label}
+                component={NavLink}
+                to={`/${page.path}`}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}>
-                <Link
-                  style={{ textDecoration: "none", color: "whitesmoke" }}
-                  to={`/${page.path}`}>
-                  {page.label}
-                </Link>
+                sx={{
+                  my: 2,
+                  color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&.active": {
+                    color: "#2851A3",
+                  },
+                }}>
+                {page.label}
               </Button>
             ))}
           </Box>
-          <Typography sx={{ mr: 2, fontFamily: "cursive", color: "inherit" }}>
+          <Typography
+            sx={{
+              mr: 2,
+              fontFamily: "cursive",
+              color: "inherit",
+              display: { xs: "none", md: "flex" },
+            }}>
             {fullName}
           </Typography>
           <Box sx={{ flexGrow: 0 }}>
@@ -185,4 +204,5 @@ const NavBar = () => {
     </AppBar>
   );
 };
+
 export default NavBar;

@@ -13,11 +13,12 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { fetchLogin } from "../utils/fatchData";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { InputAdornment } from "@mui/material";
-import { Password, Person } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
+import { IconButton, InputAdornment } from "@mui/material";
+import { Person, Visibility, VisibilityOff } from "@mui/icons-material";
 import { store } from "../redux/Store";
 import { setLoginAction } from "../redux/UserReducer";
+import { useState } from "react";
+import LockIcon from "@mui/icons-material/Lock";
 
 function Copyright(props: any) {
   return (
@@ -28,7 +29,7 @@ function Copyright(props: any) {
       {...props}>
       {"Copyright © "}
       <Link color="inherit" href="https://github.com/anton-lokianov">
-        Anton Factory
+        Anton Lokianov
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -40,12 +41,18 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
 
   const onSubmit = async (data: any) => {
     const { userName, password } = data;
@@ -65,22 +72,24 @@ export default function Login() {
   return (
     <div style={{ height: "100%" }}>
       <ThemeProvider theme={defaultTheme}>
-        <Typography
-          component="h1"
-          variant="h2"
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            borderBottom: "1px solid black",
-            p: 2,
-          }}>
-          Anton Factory
-        </Typography>
+        <Box sx={{ backgroundColor: "#828282" }}>
+          <Typography
+            component="h1"
+            variant="h2"
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              borderBottom: "1px solid black",
+              p: 2,
+            }}>
+            Anton Factory
+          </Typography>
+        </Box>
         <Container component="main" maxWidth="xs">
           <CssBaseline />
           <Box
             sx={{
-              marginTop: 8,
+              marginTop: 13,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -89,7 +98,7 @@ export default function Login() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h4">
-              Login
+              Please Login
             </Typography>
             <Box
               component="form"
@@ -97,14 +106,16 @@ export default function Login() {
               noValidate
               sx={{ mt: 1 }}>
               <TextField
+                type="text"
                 margin="normal"
                 fullWidth
                 id="userName"
                 label="User Name"
                 autoComplete="userName"
+                placeholder="enter user name..."
                 autoFocus
                 {...register("userName", { required: true })}
-                error={errors.password ? true : false}
+                error={errors.userName ? true : false}
                 helperText={errors.userName && "User name is required"}
                 InputProps={{
                   startAdornment: (
@@ -118,16 +129,30 @@ export default function Login() {
                 margin="normal"
                 fullWidth
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
+                placeholder="enter password..."
                 {...register("password", { required: true })}
                 error={errors.password ? true : false}
-                helperText={errors.password && "User name is required"}
+                helperText={errors.password && "Password is required"}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Password />
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: isFocused && (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePasswordVisibility}
+                        onMouseDown={(event) => event.preventDefault()}
+                        edge="end"
+                        tabIndex={-1}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
                     </InputAdornment>
                   ),
                 }}
@@ -137,7 +162,7 @@ export default function Login() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}>
-                Sign In
+                Login
               </Button>
               <Grid container>
                 <Grid item xs></Grid>

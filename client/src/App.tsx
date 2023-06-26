@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import Departments from "./pages/Departments";
+import Employees from "./pages/Employees";
+import Shifts from "./pages/Shifts";
 
 function Layout() {
   const location = useLocation();
@@ -14,7 +16,9 @@ function Layout() {
       <main>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/department" element={<Departments />} />
+          <Route path="/departments" element={<Departments />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/shifts" element={<Shifts />} />
           <Route path="/home" element={<Home />} />
         </Routes>
       </main>

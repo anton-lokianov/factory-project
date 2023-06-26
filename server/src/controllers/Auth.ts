@@ -45,11 +45,12 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
-    if (user.password) delete user.password;
+    const userObj = user.toObject();
+    delete userObj.password;
 
     await user.save();
 
-    res.status(200).json({ token, user });
+    res.status(200).json({ token, user: userObj });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

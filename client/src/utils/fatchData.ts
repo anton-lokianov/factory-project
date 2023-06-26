@@ -8,6 +8,7 @@ export const fetchLogin = async (data: {
 }) => {
   try {
     const response = await axios.post(`${baseUrl}/auth/login`, data);
+    console.log("hey", response.data);
     return response.data;
   } catch (err) {
     console.log(err);
