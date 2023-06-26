@@ -26,6 +26,13 @@ export const verifyToken = async (
       // Admin user has unlimited numOfActions
       next();
     } else {
+      // const currentDate = new Date().setHours(0, 0, 0, 0);
+      // if (req.user.lastResetDate < currentDate) {
+      //   // Reset numOfActions for the user
+      //   req.user.numOfActions = 10;
+      //   req.user.lastResetDate = currentDate;
+      //   await req.user.save();
+      // }
       // Check if user's numOfActions is zero
       if (req.user.numOfActions === 0) {
         return res.status(400).json({

@@ -10,6 +10,12 @@ import ShiftRoutes from "./src/routes/Shift";
 import DepartmentRoutes from "./src/routes/Department";
 
 dotenv.config();
+
+if (!process.env.MONGO_URL) {
+  console.error("Missing MONGO_URL!!!");
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
@@ -23,12 +29,14 @@ app.use("/auth", AuthRoutes);
 app.use("/employees", EmployeeRoutes);
 app.use("/shifts", ShiftRoutes);
 
-const PORT: number = parseInt(process.env.PORT || "5000");
+const PORT = process.env.PORT || 5000;
+
 mongoose
   .connect(process.env.MONGO_URL!)
   .then(() => {
     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
   })
   .catch((error) => {
-    console.log(`cannot connect to database: ${error.message}`);
+    console.log(`Cannot connect to database: ${error.message}`);
+    process.exit(1);
   });
