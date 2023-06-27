@@ -14,3 +14,15 @@ export const fetchLogin = async (data: {
     console.log(err);
   }
 };
+
+export const fetchAddDepartment = async (departmentName: string) => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/departments/`,
+      departmentName
+    );
+    console.log("hey", response.data);
+  } catch (err) {
+    console.log(err);
+  }
+};

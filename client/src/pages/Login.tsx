@@ -72,7 +72,7 @@ export default function Login() {
   return (
     <div style={{ height: "100%" }}>
       <ThemeProvider theme={defaultTheme}>
-        <Box sx={{ backgroundColor: "#828282" }}>
+        <Box sx={{ backgroundColor: "#1976b2" }}>
           <Typography
             component="h1"
             variant="h2"

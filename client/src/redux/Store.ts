@@ -28,11 +28,11 @@ const persistedDepartmentReducer = persistReducer(
 );
 const persistedShiftsReducer = persistReducer(shiftPersistConfig, shiftReducer);
 
-const rootReducer = combineReducers({
+const rootReducer = {
   users: persistedUserReducer,
   departments: persistedDepartmentReducer,
   shifts: persistedShiftsReducer,
-});
+};
 
 export const store = configureStore({
   reducer: rootReducer,
