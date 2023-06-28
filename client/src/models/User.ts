@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  _id: string;
   fullName: string;
   userName: string;
   numOfActions: number;

@@ -34,7 +34,7 @@ export const shiftReducer = (
       break;
 
     case ShiftActionType.addShift:
-      state.allShifts.push(action.payload);
+      state.allShifts = [...state.allShifts, action.payload];
       break;
 
     default:

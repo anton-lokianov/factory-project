@@ -6,6 +6,8 @@ import NavBar from "./components/NavBar";
 import Departments from "./pages/Departments";
 import Employees from "./pages/Employees";
 import Shifts from "./pages/Shifts";
+import { RootState } from "./redux/Store";
+import { useSelector } from "react-redux";
 
 function Layout() {
   const location = useLocation();

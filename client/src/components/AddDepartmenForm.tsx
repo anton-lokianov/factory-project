@@ -10,7 +10,13 @@ import { Box, Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Department } from "../models/Department";
 import { useForm } from "react-hook-form";
-import { fetchAddDepartment } from "../utils/fatchData";
+import { fetchAddDepartment, fetchGetAllDepartments } from "../utils/fatchData";
+import { RootState, store } from "../redux/Store";
+import {
+  addDepartmentAction,
+  getAllDepartmentsAction,
+} from "../redux/DepartmentReducer";
+import { useSelector } from "react-redux";
 
 export default function FormDialog() {
   const [open, setOpen] = React.useState(false);
@@ -30,10 +36,14 @@ export default function FormDialog() {
     setOpen(false);
   };
 
-  const onSubmit = (data: any) => {
-    fetchAddDepartment(data);
-    console.log(data);
-    handleClose();
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetchAddDepartment(data.name);
+      store.dispatch(addDepartmentAction(response));
+      handleClose();
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (

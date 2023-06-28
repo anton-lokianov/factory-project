@@ -1,4 +1,4 @@
-import { Box, Fab } from "@mui/material";
+import { Box, Fab, IconButton } from "@mui/material";
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,82 +9,48 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import FormDialog from "../components/AddDepartmenForm";
-
-interface Data {
-  calories: number;
-  carbs: number;
-  dessert: string;
-  fat: number;
-  id: number;
-  protein: number;
-}
+import { useEffect, useState } from "react";
+import { Department } from "../models/Department";
+import { RootState, store } from "../redux/Store";
+import { useSelector } from "react-redux";
+import {
+  fetchDeleteDepartment,
+  fetchGetAllDepartments,
+} from "../utils/fatchData";
+import {
+  deleteDepartmentAction,
+  getAllDepartmentsAction,
+} from "../redux/DepartmentReducer";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface ColumnData {
-  dataKey: keyof Data;
+  dataKey: keyof Department;
   label: string;
   numeric?: boolean;
   width: number;
 }
 
-type Sample = [string, number, number, number, number];
-
-const sample: readonly Sample[] = [
-  ["Frozen yoghurt", 159, 6.0, 24, 4.0],
-  ["Ice cream sandwich", 237, 9.0, 37, 4.3],
-  ["Eclair", 262, 16.0, 24, 6.0],
-  ["Cupcake", 305, 3.7, 67, 4.3],
-  ["Gingerbread", 356, 16.0, 49, 3.9],
-];
-
-function createData(
-  id: number,
-  dessert: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-): Data {
-  return { id, dessert, calories, fat, carbs, protein };
-}
-
 const columns: ColumnData[] = [
   {
-    width: 200,
-    label: "Dessert",
-    dataKey: "dessert",
+    width: 160,
+    label: "Department ID",
+    dataKey: "_id",
   },
   {
     width: 120,
-    label: "Calories\u00A0(g)",
-    dataKey: "calories",
-    numeric: true,
+    label: "Department Name",
+    dataKey: "name",
   },
   {
     width: 120,
-    label: "Fat\u00A0(g)",
-    dataKey: "fat",
-    numeric: true,
+    label: "Manager",
+    dataKey: "manager",
   },
-  {
-    width: 120,
-    label: "Carbs\u00A0(g)",
-    dataKey: "carbs",
-    numeric: true,
-  },
-  {
-    width: 120,
-    label: "Protein\u00A0(g)",
-    dataKey: "protein",
-    numeric: true,
-  },
+  // Add other columns as needed, matching the properties of your department objects
 ];
 
-const rows: Data[] = Array.from({ length: 200 }, (_, index) => {
-  const randomSelection = sample[Math.floor(Math.random() * sample.length)];
-  return createData(index, ...randomSelection);
-});
-
-const VirtuosoTableComponents: TableComponents<Data> = {
+const VirtuosoTableComponents: TableComponents<Department> = {
   Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
     <TableContainer component={Paper} {...props} ref={ref} />
   )),
@@ -116,11 +82,28 @@ function fixedHeaderContent() {
           {column.label}
         </TableCell>
       ))}
+      <TableCell
+        sx={{ width: 50, backgroundColor: "background.paper" }}
+        variant="head">
+        Edit
+      </TableCell>
+      <TableCell
+        sx={{ width: 50, backgroundColor: "background.paper" }}
+        variant="head">
+        Delete
+      </TableCell>
     </TableRow>
   );
 }
 
-function rowContent(_index: number, row: Data) {
+function rowContent(index: number, row: Department) {
+  if (!row) return null;
+
+  const handleDelete = (id: string) => {
+    fetchDeleteDepartment(id);
+    store.dispatch(deleteDepartmentAction(id));
+    console.log(id);
+  };
   return (
     <React.Fragment>
       {columns.map((column) => (
@@ -130,11 +113,40 @@ function rowContent(_index: number, row: Data) {
           {row[column.dataKey]}
         </TableCell>
       ))}
+      <TableCell>
+        <IconButton>
+          <EditIcon color="primary" />
+        </IconButton>
+      </TableCell>
+      <TableCell>
+        <IconButton onClick={() => handleDelete(row._id)}>
+          <DeleteIcon color="warning" />
+        </IconButton>
+      </TableCell>
     </React.Fragment>
   );
 }
 
 export default function ReactVirtualizedTable() {
+  const departments = useSelector(
+    (state: RootState) => state.departments.departments
+  );
+
+  const getDepartments = () => {
+    fetchGetAllDepartments()
+      .then((response) => {
+        store.dispatch(getAllDepartmentsAction(response));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getDepartments();
+  }, []);
+
+  console.log(departments);
   return (
     <Box
       sx={{
@@ -148,7 +160,7 @@ export default function ReactVirtualizedTable() {
       </Box>
       <Paper style={{ height: 350, width: "60%" }}>
         <TableVirtuoso
-          data={rows}
+          data={departments}
           components={VirtuosoTableComponents}
           fixedHeaderContent={fixedHeaderContent}
           itemContent={rowContent}

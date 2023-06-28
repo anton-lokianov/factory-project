@@ -71,12 +71,12 @@ export const userReducer = (
 
     case UserActionType.deleteUser:
       newState.allUsers = newState.allUsers.filter(
-        (user) => user.id !== action.payload
+        (user) => user._id !== action.payload
       );
       break;
 
     case UserActionType.addUser:
-      newState.allUsers.push(action.payload);
+      newState.allUsers = [...newState.allUsers, action.payload];
       break;
 
     case UserActionType.setLogout:
