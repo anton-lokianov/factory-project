@@ -4,4 +4,5 @@ export interface Employee {
   lastName: string;
   startWorkYear: number;
   departmentId: string; // ID of the department to which the employee belongs
+  departmentName?: string;
 }

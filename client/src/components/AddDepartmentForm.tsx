@@ -8,17 +8,12 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Box, Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { Department } from "../models/Department";
 import { useForm } from "react-hook-form";
-import { fetchAddDepartment, fetchGetAllDepartments } from "../utils/fatchData";
-import { RootState, store } from "../redux/Store";
-import {
-  addDepartmentAction,
-  getAllDepartmentsAction,
-} from "../redux/DepartmentReducer";
-import { useSelector } from "react-redux";
+import { fetchAddDepartment } from "../utils/fatchData";
+import { store } from "../redux/Store";
+import { addDepartmentAction } from "../redux/DepartmentReducer";
 
-export default function FormDialog() {
+export default function AddDepartmentFormDialog() {
   const [open, setOpen] = React.useState(false);
   const {
     reset,

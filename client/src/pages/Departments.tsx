@@ -8,7 +8,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
-import FormDialog from "../components/AddDepartmenForm";
 import { useEffect, useState } from "react";
 import { Department } from "../models/Department";
 import { RootState, store } from "../redux/Store";
@@ -21,8 +20,9 @@ import {
   deleteDepartmentAction,
   getAllDepartmentsAction,
 } from "../redux/DepartmentReducer";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddDepartmentFormDialog from "../components/AddDepartmentForm";
+import EditDepartmentFormDialog from "../components/EditDepartmentForm";
 
 interface ColumnData {
   dataKey: keyof Department;
@@ -32,11 +32,6 @@ interface ColumnData {
 }
 
 const columns: ColumnData[] = [
-  {
-    width: 160,
-    label: "Department ID",
-    dataKey: "_id",
-  },
   {
     width: 120,
     label: "Department Name",
@@ -60,6 +55,7 @@ const VirtuosoTableComponents: TableComponents<Department> = {
       sx={{ borderCollapse: "separate", tableLayout: "fixed" }}
     />
   ),
+
   TableHead,
   TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
   TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
@@ -70,6 +66,11 @@ const VirtuosoTableComponents: TableComponents<Department> = {
 function fixedHeaderContent() {
   return (
     <TableRow>
+      <TableCell
+        sx={{ width: 40, backgroundColor: "background.paper" }}
+        variant="head">
+        No.
+      </TableCell>
       {columns.map((column) => (
         <TableCell
           key={column.dataKey}
@@ -83,12 +84,12 @@ function fixedHeaderContent() {
         </TableCell>
       ))}
       <TableCell
-        sx={{ width: 50, backgroundColor: "background.paper" }}
+        sx={{ width: 40, backgroundColor: "background.paper" }}
         variant="head">
         Edit
       </TableCell>
       <TableCell
-        sx={{ width: 50, backgroundColor: "background.paper" }}
+        sx={{ width: 40, backgroundColor: "background.paper" }}
         variant="head">
         Delete
       </TableCell>
@@ -104,8 +105,10 @@ function rowContent(index: number, row: Department) {
     store.dispatch(deleteDepartmentAction(id));
     console.log(id);
   };
+
   return (
     <React.Fragment>
+      <TableCell>{index + 1}</TableCell>
       {columns.map((column) => (
         <TableCell
           key={column.dataKey}
@@ -114,9 +117,7 @@ function rowContent(index: number, row: Department) {
         </TableCell>
       ))}
       <TableCell>
-        <IconButton>
-          <EditIcon color="primary" />
-        </IconButton>
+        <EditDepartmentFormDialog departmentId={row._id} />
       </TableCell>
       <TableCell>
         <IconButton onClick={() => handleDelete(row._id)}>
@@ -156,7 +157,7 @@ export default function ReactVirtualizedTable() {
         justifyContent: "center",
       }}>
       <Box sx={{ p: 5 }}>
-        <FormDialog />
+        <AddDepartmentFormDialog />
       </Box>
       <Paper style={{ height: 350, width: "60%" }}>
         <TableVirtuoso

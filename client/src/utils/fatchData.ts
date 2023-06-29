@@ -1,6 +1,4 @@
 import axios from "axios";
-import { store } from "../redux/Store";
-import { addDepartmentAction } from "../redux/DepartmentReducer";
 
 const baseUrl = "http://localhost:4000";
 const api = axios.create({
@@ -65,6 +63,38 @@ export const fetchGetAllDepartments = async () => {
 export const fetchDeleteDepartment = async (id: string) => {
   try {
     const response = await api.delete(`/departments/${id}`);
+    if (response.status === 200) return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const fetchUpdateDepartment = async (
+  departmentId: string,
+  departmentName: string
+) => {
+  try {
+    const response = await api.put(`/departments/${departmentId}`, {
+      name: departmentName,
+    });
+    if (response.status === 200) return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const fetchAddEmployee = async (data = {}) => {
+  try {
+    const response = await api.post("/employees/", data);
+    if (response.status === 201) return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const fetchGetAllEmployees = async () => {
+  try {
+    const response = await api.get("/employees/");
     if (response.status === 200) return response.data;
   } catch (err) {
     console.log(err);

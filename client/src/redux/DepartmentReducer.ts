@@ -54,16 +54,9 @@ export const departmentReducer = (
       break;
 
     case DepartmentActionType.updateDepartment:
-      const updatedDepartmentIndex = state.departments.findIndex(
-        (department) => department._id === action.payload.id
+      state.departments = state.departments.map((department) =>
+        department._id === action.payload._id ? action.payload : department
       );
-      if (updatedDepartmentIndex !== -1) {
-        const updatedDepartment = {
-          ...state.departments[updatedDepartmentIndex],
-          name: action.payload.name,
-        };
-        state.departments[updatedDepartmentIndex] = updatedDepartment;
-      }
       break;
 
     case DepartmentActionType.deleteDepartment:

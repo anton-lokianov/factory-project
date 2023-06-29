@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import { userReducer } from "./UserReducer";
 import { departmentReducer } from "./DepartmentReducer";
 import { shiftReducer } from "./ShiftReducer";
+import { employeeReducer } from "./EmployeeReducer";
 
 const userPersistConfig = {
   key: "users",
@@ -20,6 +21,11 @@ const shiftPersistConfig = {
   storage,
 };
 
+const employeePersistConfig = {
+  key: "employees",
+  storage,
+};
+
 const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 
 const persistedDepartmentReducer = persistReducer(
@@ -28,10 +34,16 @@ const persistedDepartmentReducer = persistReducer(
 );
 const persistedShiftsReducer = persistReducer(shiftPersistConfig, shiftReducer);
 
+const persistedEmployeeReducer = persistReducer(
+  employeePersistConfig,
+  employeeReducer
+);
+
 const rootReducer = {
   users: persistedUserReducer,
   departments: persistedDepartmentReducer,
   shifts: persistedShiftsReducer,
+  employees: persistedEmployeeReducer,
 };
 
 export const store = configureStore({
