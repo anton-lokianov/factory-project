@@ -10,7 +10,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { fetchLogin } from "../utils/fatchData";
+import { fetchLogin } from "../utils/fetchData";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { IconButton, InputAdornment } from "@mui/material";

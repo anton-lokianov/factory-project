@@ -9,13 +9,19 @@ import Paper from "@mui/material/Paper";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import { Box, IconButton } from "@mui/material";
 import { Employee } from "../models/Employee";
-import { RootState } from "../redux/Store";
+import { RootState, store } from "../redux/Store";
 import { useSelector } from "react-redux";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import AddEmployeeFormDialog from "../components/AddEmployeeForm";
+import AddShiftFormDialog from "../components/AddEmployeeForm";
 import { Department } from "../models/Department";
+import { fetchDeleteEmployee, fetchGetAllEmployees } from "../utils/fetchData";
+import {
+  deleteEmployeeAction,
+  getAllEmployeesAction,
+} from "../redux/EmployeeReducer";
+import { useEffect } from "react";
 
 interface ColumnData {
   dataKey: keyof Employee;
@@ -36,7 +42,7 @@ const columns: ColumnData[] = [
     dataKey: "lastName",
   },
   {
-    width: 120,
+    width: 100,
     label: "Department",
     dataKey: "departmentName",
   },
@@ -85,6 +91,11 @@ function fixedHeaderContent() {
         </TableCell>
       ))}
       <TableCell
+        sx={{ width: 60, backgroundColor: "background.paper" }}
+        variant="head">
+        Shifts
+      </TableCell>
+      <TableCell
         sx={{ width: 30, backgroundColor: "background.paper" }}
         variant="head">
         Add shift
@@ -105,13 +116,37 @@ function fixedHeaderContent() {
 
 export default function ReactVirtualizedTable() {
   const employees = useSelector(
-    (state: RootState) => state.employees.employees
+    (state: RootState) => state.employees.employees || []
   );
+
   const departments = useSelector(
     (state: RootState) => state.departments.departments
   );
 
-  const deleteEmployee = async (id: string) => {};
+  const shifts = useSelector((state: RootState) => state.shifts.allShifts);
+  console.log(shifts);
+
+  const state = store.getState().employees.employees;
+
+  const getAllEmployees = async () => {
+    const response = await fetchGetAllEmployees();
+    store.dispatch(getAllEmployeesAction(response));
+  };
+
+  useEffect(() => {
+    if (state.length < 1) {
+      getAllEmployees();
+    }
+  }, []);
+
+  const deleteEmployee = async (id: string) => {
+    try {
+      await fetchDeleteEmployee(id);
+      store.dispatch(deleteEmployeeAction(id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const departmentIdNameMap: { [key: string]: string } = {};
   departments.forEach((department: Department) => {
@@ -122,6 +157,22 @@ export default function ReactVirtualizedTable() {
     ...employee,
     departmentName: departmentIdNameMap[employee.departmentId],
   }));
+
+  const getEmployeeShifts = (employeeId: string) => {
+    const employeeShifts = shifts.filter((shift) =>
+      shift.employeeIds.includes(employeeId)
+    );
+    return employeeShifts
+      .map((shift) => {
+        const date = new Date(shift.date);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`;
+        return `${formattedDate}, ${shift.startTime}-${shift.endTime}`;
+      })
+      .join("; ");
+  };
 
   function rowContent(index: number, row: Employee) {
     return (
@@ -138,6 +189,12 @@ export default function ReactVirtualizedTable() {
             }
           </TableCell>
         ))}
+
+        <TableCell>
+          <Box sx={{ maxHeight: 40, overflow: "auto" }}>
+            {getEmployeeShifts(row._id)}
+          </Box>
+        </TableCell>
         <TableCell>
           <IconButton>
             <AddIcon color="success" />
@@ -149,7 +206,7 @@ export default function ReactVirtualizedTable() {
           </IconButton>
         </TableCell>
         <TableCell>
-          <IconButton>
+          <IconButton onClick={() => deleteEmployee(row._id)}>
             <DeleteIcon color="warning" />
           </IconButton>
         </TableCell>
@@ -166,7 +223,7 @@ export default function ReactVirtualizedTable() {
         justifyContent: "center",
       }}>
       <Box sx={{ p: 5 }}>
-        <AddEmployeeFormDialog />
+        <AddShiftFormDialog />
       </Box>
       <Paper style={{ height: 400, width: "90%" }}>
         <TableVirtuoso

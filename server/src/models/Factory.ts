@@ -18,18 +18,14 @@ interface IEmployee extends Document {
   lastName: string;
   startWorkYear: number;
   departmentId: Schema.Types.ObjectId;
+  shiftIds: Schema.Types.ObjectId[];
 }
 
 interface IShift extends Document {
   date: Date;
-  startTime: number;
-  endTime: number;
+  startTime: string;
+  endTime: string;
   employeeIds: Schema.Types.ObjectId[];
-}
-
-interface IEmployeeShift extends Document {
-  employeeId: Schema.Types.ObjectId;
-  shiftId: Schema.Types.ObjectId;
 }
 
 const UserSchema: Schema = new Schema({
@@ -54,18 +50,19 @@ const EmployeeSchema: Schema = new Schema({
     ref: "Department",
     required: true,
   },
+  shiftIds: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Shift",
+    },
+  ],
 });
 
 const ShiftSchema: Schema = new Schema({
   date: { type: Date, required: true },
-  startTime: { type: Number, required: true },
-  endTime: { type: Number, required: true },
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
   employeeIds: [{ type: Schema.Types.ObjectId, ref: "Employee" }],
-});
-
-const EmployeeShiftSchema: Schema = new Schema({
-  employeeId: { type: Schema.Types.ObjectId, ref: "Employee", required: true },
-  shiftId: { type: Schema.Types.ObjectId, ref: "Shift", required: true },
 });
 
 export const Shift = mongoose.model<IShift>("Shift", ShiftSchema);
@@ -75,7 +72,3 @@ export const Department = mongoose.model<IDepartment>(
   DepartmentSchema
 );
 export const User = mongoose.model<IUser>("User", UserSchema);
-export const EmployeeShift = mongoose.model<IEmployeeShift>(
-  "EmployeeShift",
-  EmployeeShiftSchema
-);

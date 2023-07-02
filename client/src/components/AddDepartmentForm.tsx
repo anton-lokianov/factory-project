@@ -9,7 +9,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { Box, Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useForm } from "react-hook-form";
-import { fetchAddDepartment } from "../utils/fatchData";
+import { fetchAddDepartment } from "../utils/fetchData";
 import { store } from "../redux/Store";
 import { addDepartmentAction } from "../redux/DepartmentReducer";
 

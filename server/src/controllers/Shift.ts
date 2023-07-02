@@ -29,6 +29,12 @@ export const createShift = async (req: Request, res: Response) => {
     });
     const savedShift = await newShift.save();
 
+    // add shiftId to the shiftIds array of each employee
+    await Employee.updateMany(
+      { _id: { $in: employeeIds } },
+      { $push: { shiftIds: savedShift._id } }
+    );
+
     res.status(201).json(savedShift);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

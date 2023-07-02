@@ -1,7 +1,8 @@
 export interface Shift {
   _id: string;
-  date: Date;
-  startTime: number;
-  endTime: number;
+  date: string;
+  startTime: string;
+  endTime: string;
   employeeIds: string[]; // Array of employee IDs assigned to the shift
+  employeeNames: string[]; // Add this property
 }

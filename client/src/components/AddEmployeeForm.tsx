@@ -11,7 +11,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { RootState, store } from "../redux/Store";
-import { fetchAddEmployee } from "../utils/fatchData";
+import { fetchAddEmployee } from "../utils/fetchData";
 import { addEmployeeAction } from "../redux/EmployeeReducer";
 
 export default function AddEmployeeFormDialog() {
@@ -39,6 +39,7 @@ export default function AddEmployeeFormDialog() {
     try {
       const response = await fetchAddEmployee(data);
       store.dispatch(addEmployeeAction(response));
+      handleClose();
     } catch (error) {
       console.log(error);
     }
@@ -105,9 +106,9 @@ export default function AddEmployeeFormDialog() {
               select
               label="Department"
               fullWidth
-              defaultValue={departments[0]._id}
-              error={errors.department ? true : false}
-              helperText={errors.department && "Department is required"}>
+              defaultValue=""
+              error={errors.departmentId ? true : false}
+              helperText={errors.departmentId && "Department is required"}>
               {departments.map((option: any) => (
                 <MenuItem key={option._id} value={option._id}>
                   {option.name}

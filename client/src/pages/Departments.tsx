@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import {
   fetchDeleteDepartment,
   fetchGetAllDepartments,
-} from "../utils/fatchData";
+} from "../utils/fetchData";
 import {
   deleteDepartmentAction,
   getAllDepartmentsAction,
@@ -132,6 +132,7 @@ export default function ReactVirtualizedTable() {
   const departments = useSelector(
     (state: RootState) => state.departments.departments
   );
+  const state = store.getState().departments.departments;
 
   const getDepartments = () => {
     fetchGetAllDepartments()
@@ -144,7 +145,9 @@ export default function ReactVirtualizedTable() {
   };
 
   useEffect(() => {
-    getDepartments();
+    if (state.length < 1) {
+      getDepartments();
+    }
   }, []);
 
   console.log(departments);

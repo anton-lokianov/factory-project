@@ -6,7 +6,7 @@ export const getAllEmployees = async (req: Request, res: Response) => {
   try {
     const employees = await Employee.find()
       .populate("departmentId")
-      .populate("shifts");
+      .populate("shiftIds");
     res.status(200).json(employees);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -76,7 +76,11 @@ export const deleteEmployee = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Employee not found" });
     }
 
-    await Shift.deleteMany({ employeeId: id });
+    const shifts = await Shift.updateMany(
+      { employeeIds: id },
+      { $pull: { employeeIds: id } }
+    );
+
     await employee.deleteOne();
 
     res.status(200).json({ message: "Employee deleted successfully" });
@@ -117,9 +121,13 @@ export const addShiftToEmployee = async (req: Request, res: Response) => {
       date,
       startTime,
       endTime,
-      employeeId: id,
+      employeeIds: [id],
     });
     const savedShift = await newShift.save();
+
+    // add shiftId to the employee's shiftIds array
+    employee.shiftIds.push(savedShift._id);
+    await employee.save();
 
     res.status(201).json(savedShift);
   } catch (err: any) {

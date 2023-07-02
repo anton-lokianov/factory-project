@@ -6,9 +6,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Box, Fab, IconButton } from "@mui/material";
+import { Box, Fab, IconButton, MenuItem } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { fetchAddDepartment, fetchUpdateDepartment } from "../utils/fatchData";
+import { fetchAddDepartment, fetchUpdateDepartment } from "../utils/fetchData";
 import { RootState, store } from "../redux/Store";
 import { updateDepartmentAction } from "../redux/DepartmentReducer";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,9 +29,15 @@ const EditDepartmentFormDialog: React.FC<EditDepartmentFormDialogProps> = ({
     formState: { errors },
   } = useForm();
 
+  const employees = useSelector(
+    (state: RootState) => state.employees.employees
+  );
+  console.log("emp", employees);
+
   const departments = useSelector(
     (state: RootState) => state.departments.departments
   );
+  console.log("dep", departments);
   const departmentToEdit = departments.find(
     (dep: any) => dep._id === departmentId
   );
@@ -87,6 +93,22 @@ const EditDepartmentFormDialog: React.FC<EditDepartmentFormDialogProps> = ({
               fullWidth
               variant="standard"
             />
+            <TextField
+              sx={{ mt: 2 }}
+              {...register("departmentId", { required: true })}
+              id="department"
+              select
+              label="Department"
+              fullWidth
+              defaultValue=""
+              error={errors.departmentId ? true : false}
+              helperText={errors.departmentId && "Department is required"}>
+              {employees.map((option: any) => (
+                <MenuItem key={option.departmentId} value={option.departmentId}>
+                  {option.departmentId}
+                </MenuItem>
+              ))}
+            </TextField>
           </DialogContent>
           <DialogActions>
             <Button type="reset" onClick={handleClose}>
