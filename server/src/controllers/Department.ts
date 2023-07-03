@@ -5,6 +5,7 @@ import { Department, Employee } from "../models/Factory";
 export const getAllDepartments = async (req: Request, res: Response) => {
   try {
     const departments = await Department.find();
+
     res.status(200).json(departments);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -14,7 +15,7 @@ export const getAllDepartments = async (req: Request, res: Response) => {
 // POST /departments
 export const createDepartment = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, manager } = req.body;
 
     // Check if department with the same name already exists
     const existingDepartment = await Department.findOne({ name });
@@ -22,7 +23,7 @@ export const createDepartment = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Department already exists" });
     }
 
-    const newDepartment = new Department({ name });
+    const newDepartment = new Department({ name, manager });
     const savedDepartment = await newDepartment.save();
 
     res.status(201).json(savedDepartment);
@@ -35,15 +36,19 @@ export const createDepartment = async (req: Request, res: Response) => {
 export const updateDepartment = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, manager } = req.body;
 
-    console.log(req.params);
+    const employee = await Employee.findById(manager);
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
 
     const department = await Department.findById(id);
     if (!department) {
       return res.status(404).json({ error: "Department not found" });
     }
 
+    department.manager = manager;
     department.name = name;
     const updatedDepartment = await department.save();
 

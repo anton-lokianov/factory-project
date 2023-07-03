@@ -48,12 +48,9 @@ export default function AddShiftFormDialog() {
   };
 
   const onSubmit = async (data: any) => {
-    const formData = {
-      ...data,
-      date: new Date(data.date),
-    };
     try {
-      const response = await fetchAddShift(formData);
+      console.log(data);
+      const response = await fetchAddShift(data);
       console.log(response);
       store.dispatch(addShiftAction(response));
       handleClose();

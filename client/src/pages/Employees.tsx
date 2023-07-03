@@ -13,15 +13,11 @@ import { RootState, store } from "../redux/Store";
 import { useSelector } from "react-redux";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 import AddShiftFormDialog from "../components/AddEmployeeForm";
 import { Department } from "../models/Department";
-import { fetchDeleteEmployee, fetchGetAllEmployees } from "../utils/fetchData";
-import {
-  deleteEmployeeAction,
-  getAllEmployeesAction,
-} from "../redux/EmployeeReducer";
-import { useEffect } from "react";
+import { fetchDeleteEmployee } from "../utils/fetchData";
+import { deleteEmployeeAction } from "../redux/EmployeeReducer";
+import { AddShiftToEmployeeFormDialog } from "../components/AddShiftToEmployeeForm";
 
 interface ColumnData {
   dataKey: keyof Employee;
@@ -126,19 +122,6 @@ export default function ReactVirtualizedTable() {
   const shifts = useSelector((state: RootState) => state.shifts.allShifts);
   console.log(shifts);
 
-  const state = store.getState().employees.employees;
-
-  const getAllEmployees = async () => {
-    const response = await fetchGetAllEmployees();
-    store.dispatch(getAllEmployeesAction(response));
-  };
-
-  useEffect(() => {
-    if (state.length < 1) {
-      getAllEmployees();
-    }
-  }, []);
-
   const deleteEmployee = async (id: string) => {
     try {
       await fetchDeleteEmployee(id);
@@ -153,15 +136,24 @@ export default function ReactVirtualizedTable() {
     departmentIdNameMap[department._id] = department.name;
   });
 
-  const employeesWithDepartmentNames = employees.map((employee) => ({
-    ...employee,
-    departmentName: departmentIdNameMap[employee.departmentId],
-  }));
+  const employeesWithDepartmentNames = employees.map((employee) => {
+    let departmentName;
+    if (typeof employee.departmentId === "string") {
+      departmentName = departmentIdNameMap[employee.departmentId];
+    } else {
+      departmentName = (employee.departmentId as any).name;
+    }
+    return {
+      ...employee,
+      departmentName,
+    };
+  });
 
   const getEmployeeShifts = (employeeId: string) => {
     const employeeShifts = shifts.filter((shift) =>
       shift.employeeIds.includes(employeeId)
     );
+    console.log(employeeShifts);
     return employeeShifts
       .map((shift) => {
         const date = new Date(shift.date);
@@ -190,15 +182,9 @@ export default function ReactVirtualizedTable() {
           </TableCell>
         ))}
 
+        <TableCell>{getEmployeeShifts(row._id)}</TableCell>
         <TableCell>
-          <Box sx={{ maxHeight: 40, overflow: "auto" }}>
-            {getEmployeeShifts(row._id)}
-          </Box>
-        </TableCell>
-        <TableCell>
-          <IconButton>
-            <AddIcon color="success" />
-          </IconButton>
+          <AddShiftToEmployeeFormDialog employeeId={row._id} />
         </TableCell>
         <TableCell>
           <IconButton>

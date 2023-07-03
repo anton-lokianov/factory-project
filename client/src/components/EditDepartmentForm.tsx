@@ -6,9 +6,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Box, Fab, IconButton, MenuItem } from "@mui/material";
+import { Box, IconButton, MenuItem } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { fetchAddDepartment, fetchUpdateDepartment } from "../utils/fetchData";
+import { fetchUpdateDepartment } from "../utils/fetchData";
 import { RootState, store } from "../redux/Store";
 import { updateDepartmentAction } from "../redux/DepartmentReducer";
 import EditIcon from "@mui/icons-material/Edit";
@@ -52,7 +52,6 @@ const EditDepartmentFormDialog: React.FC<EditDepartmentFormDialogProps> = ({
 
     setOpen(true);
   };
-
   const handleClose = () => {
     reset();
     setOpen(false);
@@ -60,8 +59,11 @@ const EditDepartmentFormDialog: React.FC<EditDepartmentFormDialogProps> = ({
 
   const onSubmit = async (data: any) => {
     try {
-      console.log(data._id);
-      const response = await fetchUpdateDepartment(data._id, data.name);
+      const response = await fetchUpdateDepartment(
+        data._id,
+        data.name,
+        data.manager
+      );
       store.dispatch(updateDepartmentAction(response));
 
       handleClose();
@@ -95,17 +97,17 @@ const EditDepartmentFormDialog: React.FC<EditDepartmentFormDialogProps> = ({
             />
             <TextField
               sx={{ mt: 2 }}
-              {...register("departmentId", { required: true })}
-              id="department"
+              {...register("manager", { required: true })}
+              id="manager"
               select
-              label="Department"
+              label="manager"
               fullWidth
               defaultValue=""
-              error={errors.departmentId ? true : false}
-              helperText={errors.departmentId && "Department is required"}>
+              error={errors.employeesIds ? true : false}
+              helperText={errors.employeesIds && "Department is required"}>
               {employees.map((option: any) => (
-                <MenuItem key={option.departmentId} value={option.departmentId}>
-                  {option.departmentId}
+                <MenuItem key={option._id} value={option._id}>
+                  {option.firstName} {option.lastName}
                 </MenuItem>
               ))}
             </TextField>

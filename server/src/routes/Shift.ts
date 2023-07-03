@@ -4,12 +4,14 @@ import {
   getAllShifts,
   createShift,
   getShiftEmployees,
-} from "../controllers/shift";
+  addShiftToEmployee,
+} from "../controllers/Shift";
 
 const router = express.Router();
 
 router.get("/", verifyToken, getAllShifts);
 router.post("/", verifyToken, createShift);
 router.get("/:id/employees", verifyToken, getShiftEmployees);
+router.post("/addShiftToEmployee", verifyToken, addShiftToEmployee);
 
 export default router;

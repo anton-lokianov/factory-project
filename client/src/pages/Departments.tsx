@@ -1,4 +1,4 @@
-import { Box, Fab, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,21 +8,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
-import { useEffect, useState } from "react";
 import { Department } from "../models/Department";
 import { RootState, store } from "../redux/Store";
 import { useSelector } from "react-redux";
-import {
-  fetchDeleteDepartment,
-  fetchGetAllDepartments,
-} from "../utils/fetchData";
-import {
-  deleteDepartmentAction,
-  getAllDepartmentsAction,
-} from "../redux/DepartmentReducer";
+import { fetchDeleteDepartment } from "../utils/fetchData";
+import { deleteDepartmentAction } from "../redux/DepartmentReducer";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddDepartmentFormDialog from "../components/AddDepartmentForm";
 import EditDepartmentFormDialog from "../components/EditDepartmentForm";
+import { Employee } from "../models/Employee";
 
 interface ColumnData {
   dataKey: keyof Department;
@@ -100,8 +94,9 @@ function fixedHeaderContent() {
 function rowContent(index: number, row: Department) {
   if (!row) return null;
 
-  const handleDelete = (id: string) => {
-    fetchDeleteDepartment(id);
+  const handleDelete = async (id: string) => {
+    const response = await fetchDeleteDepartment(id);
+    if (!response) return;
     store.dispatch(deleteDepartmentAction(id));
     console.log(id);
   };
@@ -132,25 +127,27 @@ export default function ReactVirtualizedTable() {
   const departments = useSelector(
     (state: RootState) => state.departments.departments
   );
-  const state = store.getState().departments.departments;
 
-  const getDepartments = () => {
-    fetchGetAllDepartments()
-      .then((response) => {
-        store.dispatch(getAllDepartmentsAction(response));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const employees = useSelector(
+    (state: RootState) => state.employees.employees
+  );
 
-  useEffect(() => {
-    if (state.length < 1) {
-      getDepartments();
-    }
-  }, []);
+  const employeeIdNameMap: { [key: string]: string } = {};
+  employees.forEach((employee: Employee) => {
+    employeeIdNameMap[
+      employee._id
+    ] = `${employee.firstName} ${employee.lastName}`;
+  });
 
-  console.log(departments);
+  const departmentsWithManagerNames = departments.map(
+    (department: Department) => ({
+      ...department,
+      manager: Array.isArray(department.manager)
+        ? department.manager.map((id) => employeeIdNameMap[id] || "No Manager")
+        : [employeeIdNameMap[department.manager] || "No Manager"],
+    })
+  );
+
   return (
     <Box
       sx={{
@@ -164,7 +161,7 @@ export default function ReactVirtualizedTable() {
       </Box>
       <Paper style={{ height: 350, width: "60%" }}>
         <TableVirtuoso
-          data={departments}
+          data={departmentsWithManagerNames}
           components={VirtuosoTableComponents}
           fixedHeaderContent={fixedHeaderContent}
           itemContent={rowContent}

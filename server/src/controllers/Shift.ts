@@ -5,7 +5,17 @@ import { Shift, Employee } from "../models/Factory";
 export const getAllShifts = async (req: Request, res: Response) => {
   try {
     const shifts = await Shift.find().populate("employeeIds");
-    res.status(200).json(shifts);
+    const processedShifts = shifts.map((shift) => {
+      const shiftObject = shift.toObject();
+      const employeeIds = shiftObject.employeeIds.map((employee: any) =>
+        employee._id.toString()
+      );
+      return {
+        ...shiftObject,
+        employeeIds,
+      };
+    });
+    res.status(200).json(processedShifts);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -53,6 +63,44 @@ export const getShiftEmployees = async (req: Request, res: Response) => {
 
     const employees = await Employee.find({ _id: { $in: shift.employeeIds } });
     res.status(200).json(employees);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const addShiftToEmployee = async (req: Request, res: Response) => {
+  try {
+    const { shiftId, employeeId } = req.body;
+
+    // Find the employee by ID
+    const shift = await Shift.findById(shiftId);
+    const employee = await Employee.findById(employeeId);
+
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    if (!shift) {
+      return res.status(404).json({ error: "Shift not found" });
+    }
+
+    // Check if the employee already has the shift assigned
+    const hasShift = employee.shiftIds.includes(shiftId);
+    if (hasShift) {
+      return res
+        .status(400)
+        .json({ error: "Shift already assigned to employee" });
+    }
+
+    // Add the shift ID to the employee's shifts array
+    shift.employeeIds.push(employeeId);
+    employee.shiftIds.push(shiftId);
+
+    // Save the updated employee
+    await shift.save();
+    await employee.save();
+
+    res.status(200).json({ message: "Shift added to employee successfully" });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

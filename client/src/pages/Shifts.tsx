@@ -8,14 +8,10 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
 import { Box } from "@mui/material";
-import { RootState, store } from "../redux/Store";
+import { RootState } from "../redux/Store";
 import { useSelector } from "react-redux";
 import AddShiftFormDialog from "../components/AddShiftForm";
-
-import { useEffect } from "react";
 import { Shift } from "../models/Shift";
-import { getAllShiftsAction } from "../redux/ShiftReducer";
-import { fetchShifts } from "../utils/fetchData";
 import { Employee } from "../models/Employee";
 
 interface ColumnData {
@@ -91,27 +87,10 @@ function fixedHeaderContent() {
 
 export default function ReactVirtualizedTable() {
   const shifts = useSelector((state: RootState) => state.shifts.allShifts);
-  const state = store.getState().employees.employees;
   const employees = useSelector(
     (state: RootState) => state.employees.employees
   );
   console.log("shifts", shifts);
-
-  const getAllShifts = () => {
-    fetchShifts()
-      .then((response) => {
-        store.dispatch(getAllShiftsAction(response));
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      });
-  };
-
-  useEffect(() => {
-    if (state.length < 1) {
-      getAllShifts();
-    }
-  }, []);
 
   const extractDateParts = (dateString: string) => {
     const datePart = dateString.split("T")[0];

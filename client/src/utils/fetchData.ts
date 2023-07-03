@@ -42,9 +42,15 @@ export const fetchLogin = async (data: {
   }
 };
 
-export const fetchAddDepartment = async (departmentName: string) => {
+export const fetchAddDepartment = async (
+  departmentName: string,
+  manager: string
+) => {
   try {
-    const response = await api.post("/departments/", { name: departmentName });
+    const response = await api.post("/departments/", {
+      name: departmentName,
+      manager: manager,
+    });
     if (response.status === 201) return response.data;
   } catch (err) {
     console.log(err);
@@ -71,11 +77,13 @@ export const fetchDeleteDepartment = async (id: string) => {
 
 export const fetchUpdateDepartment = async (
   departmentId: string,
-  departmentName: string
+  departmentName: string,
+  manager: string
 ) => {
   try {
     const response = await api.put(`/departments/${departmentId}`, {
       name: departmentName,
+      manager: manager,
     });
     if (response.status === 200) return response.data;
   } catch (err) {
@@ -123,6 +131,22 @@ export const fetchAddShift = async (data = {}) => {
   try {
     const response = await api.post("/shifts/", data);
     if (response.status === 201) return response.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const fetchAddShiftToEmployee = async (
+  shiftId: string,
+  employeeId: string
+) => {
+  try {
+    const response = await api.post("/shifts/addShiftToEmployee", {
+      shiftId,
+      employeeId,
+    });
+    console.log(response.data);
+    if (response.status === 200) return response.data;
   } catch (err) {
     console.log(err);
   }

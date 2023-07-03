@@ -10,7 +10,7 @@ interface IUser extends Document {
 
 interface IDepartment extends Document {
   name: string;
-  manager: Schema.Types.ObjectId;
+  manager: Schema.Types.ObjectId[];
 }
 
 interface IEmployee extends Document {
